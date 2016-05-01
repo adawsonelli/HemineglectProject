@@ -33,10 +33,10 @@ class Simulator:
 
 
 
-	def leftBias(self, alpha, sec):
+	def leftBias(self, gamma, sec):
 		"""
 		creates sec, seconds of random samples of head orientation data to simulate a Left
-		head orientational bias of alpha degrees of yaw (positive by kinect convention)
+		head orientational bias of gamma egrees of yaw (positive by kinect convention)
 		"""
 		samples = sec*self.sr
 		for sample in range(0, samples):
@@ -44,32 +44,63 @@ class Simulator:
 			time = self.simulateTime()
 
 			#simulate random yaw angle
-			pitch =   0.0 + random.gauss(0,1)
-			roll  =   0.0 + random.gauss(0,1)
-			yaw   = alpha + random.gauss(0,1)
-			orientation = [pitch, roll, yaw ]
+			orientation = changeOrientationAddNoise(0,0,gamma)
 
 			#package into sample, and append to sample list
 			sample = self.packageSample(time, orientation)
 			self.sampleList.append(sample)
 
 
-	def rightBias(self, alpha, sec ):
+	def rightBias(self, gamma, sec ):
 		"""
 		creates n random samples of head orientation data to simulate a Right
-		head orientational bias of -alpha degrees of yaw (negative by kinect convention)
+		head orientational bias of -gamma degrees of yaw (negative by kinect convention)
 		"""
-
-	def leftHeadTurn(self, amplitude, sec):
-		"""
-		turns head left (yaw) by amplitude degrees, over sec of time.
-		"""
+		self.leftBias(-gamma, sec)
 
 
-	def rightHeadTurn(self, amplitude,sec):
+	def headTurnGeneral(self, angle, sec, p, y, r ):
 		"""
-		turns head left (yaw) by amplitude degrees, over sec of time.
+		float, float, bool, bool, bool -> none
+		abstract (private) function that that can create any of the principle 
+		rotations, but only one at a time, not two or more simultaniously.
 		"""
+
+		#----model angle at each time step, and then add some noise----
+		samples = sec*self.sr
+		samplePeriod = 1/self.sr
+
+		for sample in range(0, samples):
+			self.n += 1 #increment sample counter
+			runTime = self.simulateTime()
+			modelTime = sample * samplePeriod
+
+			#model rotation at current time step
+			theta = genRotationKinematics(angle, sec, modelTime)
+
+			#simulate random rotation angle, add noise 
+			orientation = changeOrientationAddNoise(angle*p, angle*y, angle*r)
+
+			#package into sample, and append to sample list
+			sample = self.packageSample(runTime, orientation)
+			self.sampleList.append(sample)
+
+
+
+	def leftHeadTurn(self, angle, sec):
+		"""
+		turns head left (yaw) by "angle" degrees, over sec of time, 
+		assuming a constant (magnitude) acceleration trajectory. 
+		"""
+		
+
+
+	def rightHeadTurn(self, angle,sec):
+		"""
+		turns head right (yaw) by "angle" degrees, over sec of time,
+		assuming a constant (magnituce) acceleration trajectory.
+		"""
+		leftHeadTurn(-angle, sec)
 
 
 	def nod(self, sec):
@@ -80,6 +111,52 @@ class Simulator:
 
 	#-----------helper methods-----------------------
 
+	def genRotationKinematics(self, angle, sec, modelTime):
+		"""
+		float, float, float -> float
+
+		uses constant magnitude acceleration to calcuate head rotation
+		kinematics. is implemented as a split function where half the time 
+		is spent accelerating, half decelerating
+
+		alpha is acceleration, omega is angular velocity, theta (or angle) is angle
+		"""
+		#-------this is getting repeatedly executed, which is unnecessary
+
+		#determine acceleration value to get to halfway point in half the time
+		halfTime = sec/2
+		halfAngle = angle/2
+		alpha = (halfAngle*2.0)/(halfTime**2)
+
+		#determine the values of the model at the halfway point for the second to
+		#be used as initial conditions for the second part of the split function
+		omegaHalf = alpha*(halfTime)
+
+		#-------- end
+
+		#model rotation at current time step
+		if modelTime < halfTime: #first function of split function
+			theta = (alpha/2)*modelTime**2
+		else if modelTime >= halfTime: #second half of the split function
+			theta = (-alpha/2)*modelTime**2 + omegaHalf*modelTime + halfAngle
+
+		return theta 
+
+
+	def changeOrientationAddNoise(alpha, beta, gamma):
+		"""
+		float, float, float -> list
+		function to implement rotations alpha, beta, gamma, 
+		and add simulated gaussian noise to the measurement
+		"""
+
+				pitch =  alpha + random.gauss(0,1)
+				roll  =  beta  + random.gauss(0,1)
+				yaw   =  gamma + random.gauss(0,1)
+				orientation = [pitch, roll, yaw ]
+				return orientation
+
+
 	def simulateTime(self):
 		"""
 		self, int -> float
@@ -88,6 +165,8 @@ class Simulator:
 		"""
 		
 		return self.birth + (1.0/self.sr * self.n)
+
+
 
 
 	def packageSample(self, timeStamp, orientation):
@@ -109,6 +188,7 @@ class Simulator:
 		for processing by data analysis scripts. 
 		"""
 
+#------------put it all together------------------------
 	
 	def exampleData(self):
 		"""
