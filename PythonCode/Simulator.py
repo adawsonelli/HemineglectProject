@@ -110,6 +110,25 @@ class Simulator:
 		"""
 
 	
+	def exampleData(self):
+		"""
+		uses many of the simulator class methods to simulate
+		and publish example data, to be used by analysis scripts
+		"""
+		#generate simulated activity
+		#working at a computer, 
+		self.rightBias(5,120)
+		self.leftHeadTurn(50,1) #looking left to talk to a collegue,
+		self.leftBias(50,30)
+		self.nod(2):            #noding in agreement
+		self.rightHeadTurn(50,1) #return to work
+		self.rightBias(5,20)  
+
+		#publish activity to a file
+		self.publish()
+
+
+
 
 
 
