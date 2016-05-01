@@ -1,6 +1,9 @@
+#Author: Alex Dawson-Elli
+
 
 #-----imports--------
 import time as time
+import random 
 
 class Simulator:
 	""" 
@@ -25,8 +28,8 @@ class Simulator:
 		"""
 		self.birth =  time.time() # time that the simulator object was created.
 		self.n     = 0  #counter for total number of samples in simulation.  
-		self.sr    = 30 #sample rate for simulator
-		self.
+		self.sr    = 25 #sample rate for simulators
+		self.sampleList = [] #initialize empty sample list that will contain all samples
 
 
 
@@ -35,6 +38,20 @@ class Simulator:
 		creates sec, seconds of random samples of head orientation data to simulate a Left
 		head orientational bias of alpha degrees of yaw (positive by kinect convention)
 		"""
+		samples = sec*self.sr
+		for sample in range(0, samples):
+			self.n += 1 #increment sample counter
+			time = self.simulateTime()
+
+			#simulate random yaw angle
+			pitch =   0.0 + random.gauss(0,1)
+			roll  =   0.0 + random.gauss(0,1)
+			yaw   = alpha + random.gauss(0,1)
+			orientation = [pitch, roll, yaw ]
+
+			#package into sample, and append to sample list
+			sample = self.packageSample(time, orientation)
+			self.sampleList.append(sample)
 
 
 	def rightBias(self, alpha, sec ):
@@ -61,11 +78,28 @@ class Simulator:
 		taking place over sec number or seconds
 		"""
 
-	def simlulateTimes(self):
+	#-----------helper methods-----------------------
+
+	def simulateTime(self):
 		"""
+		self, int -> float
 		simulates sequential time stamps, starting with the birth time of the 
 		simulation object. 
 		"""
+		
+		return self.birth + (1.0/self.sr * self.n)
+
+
+	def packageSample(self, timeStamp, orientation):
+		"""
+		float, list(float, float, float) -> dict
+		packages up the timestamp and the orientation data into a dictionary,
+		representing a single sample
+		"""
+		sample = {}
+		sample['time'] =  timeStamp
+		sample['orientation'] = orientation
+		return sample
 
 
 
@@ -75,12 +109,7 @@ class Simulator:
 		for processing by data analysis scripts. 
 		"""
 
-	def test():
-		"""
-		consider putting the testing functions within the class, as this
-		is compelling from an organizational standpoint
-		"""
-		pass
+	
 
 
 
