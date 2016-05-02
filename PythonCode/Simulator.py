@@ -5,6 +5,7 @@
 import time as time
 import random 
 
+
 class Simulator:
 	""" 
 	The purpose of this class is to simulate different types
@@ -44,7 +45,7 @@ class Simulator:
 			time = self.simulateTime()
 
 			#simulate random yaw angle
-			orientation = changeOrientationAddNoise(0,0,gamma)
+			orientation = self.changeOrientationAddNoise(0,0,gamma)
 
 			#package into sample, and append to sample list
 			sample = self.packageSample(time, orientation)
@@ -67,7 +68,7 @@ class Simulator:
 		"""
 
 		#----model angle at each time step, and then add some noise----
-		sam ples = sec*self.sr
+		samples = sec*self.sr
 		samplePeriod = 1/self.sr
 
 		for sample in range(0, samples):
@@ -76,10 +77,10 @@ class Simulator:
 			modelTime = sample * samplePeriod
 
 			#model rotation at current time step
-			theta = genRotationKinematics(angle, sec, modelTime)
+			theta = self.genRotationKinematics(angle, sec, modelTime)
 
 			#simulate random rotation angle, add noise 
-			orientation = changeOrientationAddNoise(angle*p, angle*y, angle*r)
+			orientation = self.changeOrientationAddNoise(angle*p, angle*y, angle*r)
 
 			#package into sample, and append to sample list
 			sample = self.packageSample(runTime, orientation)
@@ -137,32 +138,35 @@ class Simulator:
 			omegaHalf = alpha*(halfTime)
 
 		except ZeroDivisionError:
-			raise ZeroDivisionError('sec and angle parameters must be greater than zero')
+			raise ZeroDivisionError('sec parameter must be greater than zero')
 
 
 		#-------- end
 
 		#model rotation at current time step
 		if modelTime < halfTime: #first function of split function
-			theta = (alpha/2)*modelTime**2
-		else if modelTime >= halfTime: #second half of the split function
-			theta = (-alpha/2)*modelTime**2 + omegaHalf*modelTime + halfAngle
+			theta = .5*(alpha)*modelTime**2
+		elif modelTime >= halfTime: #second half of the split function
+			theta = .5*(-alpha)*(modelTime-halfTime)**2 + omegaHalf*modelTime - halfAngle
 
+
+		#round output to the proper number of decimal places
+		theta = round(theta, 3)
 		return theta 
 
 
-	def changeOrientationAddNoise(alpha, beta, gamma):
+	def changeOrientationAddNoise(self, alpha, beta, gamma):
 		"""
 		float, float, float -> list
 		function to implement rotations alpha, beta, gamma, 
 		and add simulated gaussian noise to the measurement
 		"""
 
-				pitch =  alpha + random.gauss(0,1)
-				roll  =  beta  + random.gauss(0,1)
-				yaw   =  gamma + random.gauss(0,1)
-				orientation = [pitch, roll, yaw ]
-				return orientation
+		pitch =  alpha + random.gauss(0,1)
+		roll  =  beta  + random.gauss(0,1)
+		yaw   =  gamma + random.gauss(0,1)
+		orientation = [pitch, roll, yaw ]
+		return orientation
 
 
 	def simulateTime(self):
@@ -208,7 +212,7 @@ class Simulator:
 		self.rightBias(5,120)
 		self.leftHeadTurn(50,1) #looking left to talk to a collegue,
 		self.leftBias(50,30)
-		self.nod(2):            #noding in agreement
+		self.nod(2)         #noding in agreement
 		self.rightHeadTurn(50,1) #return to work
 		self.rightBias(5,20)  
 

@@ -8,6 +8,7 @@ run from the command line, using the nosetest command
 """
 #-------------------------import libraries------------------------------
 import Simulator as Sim
+from nose.tools import *
 
 
 #-------------------------Simulator Tests--------------------------------
@@ -43,6 +44,45 @@ def test_leftBias():
 		flag = yaw < 5 + 4  and yaw > 5 - 4 
 		assert flag == True
 		#value should not exceed 4 standard deviations from the mean
+
+
+def test_genRotationKinematics():
+	#test several samples along an example curve
+	angle = 20  #degrees
+	totalTime  = .5  #seconds to turn head
+	modelTime = 0  #time of event
+
+	#test positive values of alpha
+	sample = sim.genRotationKinematics(angle, totalTime, modelTime) 
+	assert sample == 0
+	modelTime = .1
+	sample = sim.genRotationKinematics(angle, totalTime, modelTime) 
+	assert sample == 1.6
+	modelTime = .4
+	sample = sim.genRotationKinematics(angle, totalTime, modelTime) 
+	assert sample == 18.4
+	modelTime = .5
+	sample = sim.genRotationKinematics(angle, totalTime, modelTime) 
+	assert sample == 20
+
+	#test negative values of alpha
+	modelTime = 0  #time of event
+	sample = sim.genRotationKinematics(-angle, totalTime, modelTime) 
+	assert sample == 0
+	modelTime = .1
+	sample = sim.genRotationKinematics(-angle, totalTime, modelTime) 
+	assert sample == -1.6
+	modelTime = .4
+	sample = sim.genRotationKinematics(-angle, totalTime, modelTime) 
+	assert sample == -18.4
+	modelTime = .5
+	sample = sim.genRotationKinematics(-angle, totalTime, modelTime) 
+	assert sample == -20
+
+	#test for exceptions on ZeroDivisionErrors
+	assert_raises(ZeroDivisionError, sim.genRotationKinematics, angle, 0 , modelTime) 
+  
+	
 
 
 
