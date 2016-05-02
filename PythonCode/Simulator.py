@@ -68,7 +68,7 @@ class Simulator:
 		"""
 
 		#----model angle at each time step, and then add some noise----
-		samples = sec*self.sr
+		samples = int(sec*self.sr)
 		samplePeriod = 1/self.sr
 
 		for sample in range(0, samples):
@@ -93,7 +93,7 @@ class Simulator:
 		turns head left (yaw) by "angle" degrees, over sec of time, 
 		assuming a constant (magnitude) acceleration trajectory. 
 		"""
-		headTurnGeneral(angle, sec, 0, 1, 0 )
+		self.headTurnGeneral(angle, sec, 0, 1, 0 )
 		
 
 
@@ -102,7 +102,7 @@ class Simulator:
 		turns head right (yaw) by "angle" degrees, over sec of time,
 		assuming a constant (magnituce) acceleration trajectory.
 		"""
-		headTurnGeneral(-angle, sec, 0, 1, 0 )
+		self.headTurnGeneral(-angle, sec, 0, 1, 0 )
 
 
 	def nod(self, angle, sec):
@@ -110,11 +110,11 @@ class Simulator:
 		simulates a nod event (one up and down) about the pitch axis
 		taking place over sec number or seconds
 		"""
-		headTurnGeneral( angle/2.0, sec/4.0, 0, 1, 0)
-		headTurnGeneral(-angle, sec, 0, 1, 0 )
-		headTurnGeneral( angle/2.0, sec/4.0, 0, 1, 0)
+		self.headTurnGeneral( angle/2.0, sec/4.0, 0, 1, 0)
+		self.headTurnGeneral(-angle, sec, 0, 1, 0 )
+		self.headTurnGeneral( angle/2.0, sec/4.0, 0, 1, 0)
 
-	#-----------helper methods-----------------------
+	#-----------private methods-----------------------
 
 	def genRotationKinematics(self, angle, sec, modelTime):
 		"""
@@ -193,12 +193,34 @@ class Simulator:
 		return sample
 
 
+	def sample2string(self, sample):
+		"""
+		dict -> string
+		converts a sample of simulated data that has been packaged up,
+		into a string
+		"""
+		dlim = "    "  #4spaces is delimiter
+		string = ""
+		string += str(sample['time']) + dlim 
+		string += str(sample['orientation'][0]) + dlim
+		string += str(sample['orientation'][1]) + dlim
+		string += str(sample['orientation'][2]) + '\n'
+
+		return string
+
+
 
 	def publish(self, filename):
 		"""
+		string -> none
 		writes all events in the simulator's object data structure to a file
 		for processing by data analysis scripts. 
 		"""
+		file = open(filename, 'w')
+		for sample in self.sampleList:
+			string = self.sample2string(sample)
+			file.write(string)
+		file.close()
 
 #------------put it all together------------------------
 	
@@ -212,12 +234,12 @@ class Simulator:
 		self.rightBias(5,120)
 		self.leftHeadTurn(50,1) #looking left to talk to a collegue,
 		self.leftBias(50,30)
-		self.nod(2)         #noding in agreement
+		self.nod(10,2)         #noding in agreement
 		self.rightHeadTurn(50,1) #return to work
 		self.rightBias(5,20)  
 
 		#publish activity to a file
-		self.publish()
+		self.publish('exampleData.txt')
 
 
 

@@ -82,6 +82,13 @@ def test_genRotationKinematics():
 	#test for exceptions on ZeroDivisionErrors
 	assert_raises(ZeroDivisionError, sim.genRotationKinematics, angle, 0 , modelTime) 
   
+
+def test_sample2string():
+  	sample = {'time': 123.456, 'orientation': (0.0,3.5,0.0)}
+  	string = sim.sample2string(sample)
+  	assert string == '123.456    0.0    3.5    0.0'
+  	assert string.split() == ['123.456', '0.0', '3.5', '0.0']
+
 	
 
 
