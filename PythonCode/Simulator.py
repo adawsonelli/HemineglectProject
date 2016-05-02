@@ -67,7 +67,7 @@ class Simulator:
 		"""
 
 		#----model angle at each time step, and then add some noise----
-		samples = sec*self.sr
+		sam ples = sec*self.sr
 		samplePeriod = 1/self.sr
 
 		for sample in range(0, samples):
@@ -92,6 +92,7 @@ class Simulator:
 		turns head left (yaw) by "angle" degrees, over sec of time, 
 		assuming a constant (magnitude) acceleration trajectory. 
 		"""
+		headTurnGeneral(angle, sec, 0, 1, 0 )
 		
 
 
@@ -100,14 +101,17 @@ class Simulator:
 		turns head right (yaw) by "angle" degrees, over sec of time,
 		assuming a constant (magnituce) acceleration trajectory.
 		"""
-		leftHeadTurn(-angle, sec)
+		headTurnGeneral(-angle, sec, 0, 1, 0 )
 
 
-	def nod(self, sec):
+	def nod(self, angle, sec):
 		"""
 		simulates a nod event (one up and down) about the pitch axis
 		taking place over sec number or seconds
 		"""
+		headTurnGeneral( angle/2.0, sec/4.0, 0, 1, 0)
+		headTurnGeneral(-angle, sec, 0, 1, 0 )
+		headTurnGeneral( angle/2.0, sec/4.0, 0, 1, 0)
 
 	#-----------helper methods-----------------------
 
@@ -122,15 +126,19 @@ class Simulator:
 		alpha is acceleration, omega is angular velocity, theta (or angle) is angle
 		"""
 		#-------this is getting repeatedly executed, which is unnecessary
+		try:
+			#determine acceleration value to get to halfway point in half the time
+			halfTime = sec/2
+			halfAngle = angle/2
+			alpha = (halfAngle*2.0)/(halfTime**2)
 
-		#determine acceleration value to get to halfway point in half the time
-		halfTime = sec/2
-		halfAngle = angle/2
-		alpha = (halfAngle*2.0)/(halfTime**2)
+			#determine the values of the model at the halfway point for the second to
+			#be used as initial conditions for the second part of the split function
+			omegaHalf = alpha*(halfTime)
 
-		#determine the values of the model at the halfway point for the second to
-		#be used as initial conditions for the second part of the split function
-		omegaHalf = alpha*(halfTime)
+		except ZeroDivisionError:
+			raise ZeroDivisionError('sec and angle parameters must be greater than zero')
+
 
 		#-------- end
 
