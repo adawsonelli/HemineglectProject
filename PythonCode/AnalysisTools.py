@@ -1,8 +1,11 @@
 #author Alex Dawson-Elli
 
 #-----imports------
+import numpy as np
+import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
 
-class analysisTools:
+class AnalysisTools:
 	"""
 	The purpose of this class is to analyse head rotation data
 	to develop metrics for characterizing patient head posture asymmetry.
@@ -20,6 +23,26 @@ class analysisTools:
 		takes in the filename of a file to analyze, and writes it
 		into self.rawData
 		"""
+		sample = {}
+		file = open(filename, 'r')
+		line = self.cleanReadline(file) #read first line
+		while line != '': #haven't reached the end of the file
+			#reset sample
+			sample = {}
+
+			#parse line into sample dict
+			line = line.split()
+			sample['time'] = float(line[0])
+			orientationList = [float(line[1]), float(line[2]), float(line[3])]
+			sample['orientation'] = orientationList
+
+			#add sample to self.rawData
+			self.rawData.append(sample)
+
+			#read next line
+			line = self.cleanReadline(file) 
+
+		file.close()
 
 	def removeZeros():
 		"""
@@ -40,6 +63,33 @@ class analysisTools:
 		none -> none
 		filter's self.rawData into self. filtData
 		"""
+
+	def cleanReadline(self, file):
+		""" 
+		file -> str
+
+		this function is a modified version of read line that will be used to 
+		clean (remove) comments and blank lines. The function will return the next availible
+		line that is not a comment or blank (newline)
+		"""
+		flag = True
+		while flag:
+			#init comment and blank
+			comment = False
+			blank = False
+			#readline
+			line = file.readline()
+			# test for comments
+			if  '#' in line:
+				comment = True
+			#test for blank line
+			if line.strip(' ') == '\n':  #strip used to get rid of leading whitespace
+				blank = True
+
+			#logic
+			flag = comment | blank
+
+		return line
 
 
 	def filtHeadturns():

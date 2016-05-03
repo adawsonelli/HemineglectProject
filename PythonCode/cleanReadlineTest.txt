@@ -1,0 +1,14 @@
+##this is a test for cleanReadline function 
+#of the AnalysisTool class
+this
+
+
+
+is
+
+
+a
+
+##
+
+test

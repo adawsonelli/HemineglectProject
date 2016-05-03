@@ -1,0 +1,7 @@
+##this is a test for reading in raw data
+##that contains time and orientation information
+##thereby testing the readInRawData function
+
+123.11    0    3.44    3.55
+123.22    3    .141    5926
+123.33    2    .718    2818

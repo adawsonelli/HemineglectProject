@@ -8,6 +8,7 @@ run from the command line, using the nosetest command
 """
 #-------------------------import libraries------------------------------
 import Simulator as Sim
+import AnalysisTools as Analysis
 from nose.tools import *
 
 
@@ -86,21 +87,45 @@ def test_genRotationKinematics():
 def test_sample2string():
   	sample = {'time': 123.456, 'orientation': (0.0,3.5,0.0)}
   	string = sim.sample2string(sample)
-  	assert string == '123.456    0.0    3.5    0.0'
+  	assert string.strip() == '123.456    0.0    3.5    0.0'  #remove \n with strip method
   	assert string.split() == ['123.456', '0.0', '3.5', '0.0']
-
-	
-
-
-
-
-
-
-	
-
-
-
 
 
 #-------------------------AnalysisTools Tests----------------------------
 
+#instantiate analysisTools object
+anaTool = Analysis.AnalysisTools()
+
+def test_cleanReadline():
+	testFile = open('cleanReadlineTest.txt')
+	testList = []
+	line = anaTool.cleanReadline(testFile)
+	while line != '': #haven't reached the end of the file
+		line = line.strip()  # remove newline character
+		testList.append(line)
+		line = anaTool.cleanReadline(testFile)
+
+
+	#test 
+	print(testList)
+	assert testList == ['this', 'is', 'a', 'test']
+
+
+def test_readInRawData():
+	anaTool.readInRawData('readInRawDataTest.txt')
+
+	#test result
+	print( anaTool.rawData)
+	assert anaTool.rawData[0]['time'] == 123.11
+	assert anaTool.rawData[1]['time'] == 123.22
+	assert anaTool.rawData[2]['time'] == 123.33
+	assert anaTool.rawData[0]['orientation'] == [0, 3.44, 3.55]
+	assert anaTool.rawData[1]['orientation'] == [3, .141, 5926]
+	assert anaTool.rawData[2]['orientation'] == [2, .718, 2818]
+
+
+
+
+
+
+#git commit -m "added implementation for cleanReadLine, ReadInRawData and tests for cleanRead line"
