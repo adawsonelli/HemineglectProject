@@ -126,6 +126,13 @@ def test_readInRawData():
 
 
 
+def test_removeZeros():
+	#the length of the test vector from readInRawData
+	assert len(anaTool.rawData) == 4
 
+	#filter out the zero orientation at the end of the file
+	anaTool.removeZeros()
 
-#git commit -m "added implementation for cleanReadLine, ReadInRawData and tests for cleanRead line"
+	#test final length
+	assert len(anaTool.filtData) == 3 # zero removed
+

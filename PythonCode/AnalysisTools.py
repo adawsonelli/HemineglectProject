@@ -44,11 +44,19 @@ class AnalysisTools:
 
 		file.close()
 
-	def removeZeros():
+	def removeZeros(self):
 		"""
 		patient may walk away from the computer or step out of the FOV 
-		the camera for a period of time. this function trims zero events out 
+		the camera for a period of time. potentially on a real system, this 
+		would cause a bunch of zeros to be recorded for that time.
+		this function trims these zero events out .
 		"""
+		for sample in self.rawData:
+			if sample['orientation'] == [0, 0, 0]:
+				pass
+			else:
+				self.filtData.append(sample)
+
 
 	def removeFarAwayEvents():
 		"""
