@@ -30,6 +30,7 @@ class Simulator:
 		self.birth =  time.time() # time that the simulator object was created.
 		self.n     = 0  #counter for total number of samples in simulation.  
 		self.sr    = 25 #sample rate for simulators
+		self.noiseStd   = 1  #standard deviation of the noise
 		self.sampleList = [] #initialize empty sample list that will contain all samples
 
 
@@ -162,9 +163,9 @@ class Simulator:
 		and add simulated gaussian noise to the measurement
 		"""
 
-		pitch =  alpha + random.gauss(0,1)
-		roll  =  beta  + random.gauss(0,1)
-		yaw   =  gamma + random.gauss(0,1)
+		pitch =  alpha + random.gauss(0,self.noiseStd)
+		roll  =  beta  + random.gauss(0,self.noiseStd)
+		yaw   =  gamma + random.gauss(0,self.noiseStd)
 		orientation = [pitch, roll, yaw ]
 		return orientation
 
