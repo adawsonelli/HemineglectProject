@@ -15,6 +15,8 @@ class AnalysisTools:
 	def __init__(self):
 		self.rawData = []
 		self.filtData = []
+		self.leftHeadTurns =  0
+		self.rightHeadTurns = 0
 
 
 	def readInRawData(self, filename):
@@ -51,14 +53,21 @@ class AnalysisTools:
 		would cause a bunch of zeros to be recorded for that time.
 		this function trims these zero events out .
 		"""
-		for sample in self.rawData:
+		rawDataNew = []
+		for index, sample in enumerate(self.rawData):
 			if sample['orientation'] == [0, 0, 0]:
 				pass
 			else:
-				self.filtData.append(sample)
+				rawDataNew.append(sample)
+		self.rawData = rawDataNew
+		##----------remove this later!!-------
+		self.filtData = self.rawData
+		##------------------------------------
 
 
-	def removeFarAwayEvents():
+
+
+	def removeFarAwayEvents(self):
 		"""
 		when patient is entering or exiting the frame, we want to 
 		filter out that event so it doesn't get used in our statistics
@@ -66,11 +75,7 @@ class AnalysisTools:
 		"""
 		pass #to be implemented 
 
-	def filterData():
-		"""
-		none -> none
-		filter's self.rawData into self. filtData
-		"""
+	
 
 	def cleanReadline(self, file):
 		""" 
@@ -102,28 +107,71 @@ class AnalysisTools:
 
 	def filtHeadturns():
 		"""
+		filters out turning events, catagorizing them into left
+		or right turning events. 
 		"""
 
-	def calcAvgHeadPos():
+
+	def calcAvgHeadPos(self):
 		"""
 		none -> list
 		finds the average of the filtered head data
 		"""
+		acc = [0,0,0] #accumulator
+		for sample in self.filtData:
+			for index, angle in enumerate(sample['orientation']):
+				acc[index] += angle
+		
+		#calc average
+		avg = []
+		l = len(self.filtData)
+		for i in range(3):
+			mean = round((acc[i]/l), 3)
+			avg.append(mean)
 
-	def calcStdDev():
+		return avg
+
+
+	def calcStdDevHeadPos(self):
 		"""
 		none -> list
 		finds the standard deviation of the filtered head data
 		"""
+		mean = np.array(self.calcAvgHeadPos())
+		n = len(self.filtData)
+		acc = np.array([0.0,0.0,0.0])
+		for sample in self.filtData:
+			orientation = np.array(sample['orientation'])
+			sqrd = (orientation - mean)**2
+			acc += sqrd
+
+		acc = acc*(1.0/(n - 1))
+		acc = acc**(.5)
+		acc = acc.round(3)
+		print(acc.tolist())
+		return acc.tolist()
 
 
-	#--------------------- public functions--------------------------------
+
 	def countHeadturns():
 		"""
 		none -> int, int
 		count the total number of head turns during the recorded event
 		return the number of left turns, the number of right turns
 		"""
+
+
+	#--------------------- public functions--------------------------------
+	def loadData(self, filename):
+		"""
+		executes all steps required to read in data from a text file, 
+		clean and filter it, and update all data within the class 
+		"""
+		self.readInRawData(filename)
+		self.removeZeros()
+		self.countHeadturns()
+
+
 
 
 	def displayPlot():

@@ -124,8 +124,6 @@ def test_readInRawData():
 	assert anaTool.rawData[2]['orientation'] == [2, .718, 2818]
 
 
-
-
 def test_removeZeros():
 	#the length of the test vector from readInRawData
 	assert len(anaTool.rawData) == 4
@@ -134,5 +132,20 @@ def test_removeZeros():
 	anaTool.removeZeros()
 
 	#test final length
-	assert len(anaTool.filtData) == 3 # zero removed
+	assert len(anaTool.rawData) == 3 # zero removed
+
+def test_calcAvgHeadPos():
+	avg = anaTool.calcAvgHeadPos()
+	assert avg == [1.667, 1.433, 2915.850]
+
+def test_calcStdDevHeadPos():
+	dev = anaTool.calcStdDevHeadPos()
+	assert dev == [1.528,  1.762,  2962.437]
+
+
+
+# def test_filtHeadturns():
+# 	anaTool.filterHeadTurns()
+# 	assert self.leftHeadTurns == 1
+# 	assert self.rightHeadTurns == 1
 
