@@ -12,11 +12,22 @@ class AnalysisTools:
 	"""
 
 	#----------------------private Functions-------------------------------
-	def __init__(self):
+	def __init__(self, filename = ""):
+
 		self.rawData = []
 		self.filtData = []
 		self.leftHeadTurns =  0
 		self.rightHeadTurns = 0
+
+		if filename == "": 
+			self.sr = 0 #sampleRate
+
+		else: #filename is supplied by user
+			self.readInRawData(filename)
+			self.removeZeros()
+			self.filtData = self.filtHeadTurns()
+			self.sr = self.findSR()
+
 
 
 	def readInRawData(self, filename):
@@ -105,11 +116,50 @@ class AnalysisTools:
 		return line
 
 
-	def filtHeadturns():
+	def filtHeadTurns(self):
 		"""
 		filters out turning events, catagorizing them into left
 		or right turning events. 
 		"""
+		##assumptions: 
+			#-head turns take at least .5sec to complete
+			#-threasholding isn't a crappy algorithm
+			#-threashold for head turn is 30 degrees,
+			# this is too severe to a steadystate bias 
+			#-only investigating yaw at this point
+			#-patient doesn't start in a turning event
+
+		##----------remove this later!!-------
+		self.filtData = self.rawData
+		##------------------------------------
+
+
+
+	# def detectLeftTurn():
+	# 	tH = 30 #threashold for detecting turn event
+	# 	findSR()
+
+	# 	pastBelowThresh = self.rawData[0]['time']
+	# 	for sample in self.rawData:
+	# 		currentYaw = sample['orientation'][2] #current yaw measurement
+
+	# 		#is yaw above or below the threashold?
+	# 		if currentYaw > tH:
+	# 			pass
+	# 		elif currentYaw < hH:
+	# 			deltaTime = 12
+
+
+
+	def findSR(self):
+		"""
+		determines the SR based on the timestamps, and saves it to
+		the attribute self.sr
+		"""
+		t1 = self.rawData[0]['time']
+		t2 = self.rawData[1]['time']
+		delT = t2-t1
+		self.sr = 1/delT
 
 
 	def calcAvgHeadPos(self):
@@ -153,13 +203,6 @@ class AnalysisTools:
 
 
 
-	def countHeadturns():
-		"""
-		none -> int, int
-		count the total number of head turns during the recorded event
-		return the number of left turns, the number of right turns
-		"""
-
 
 	#--------------------- public functions--------------------------------
 	def loadData(self, filename):
@@ -169,17 +212,20 @@ class AnalysisTools:
 		"""
 		self.readInRawData(filename)
 		self.removeZeros()
-		self.countHeadturns()
+		self.filtHeadTurns()
 
 
 
+	# def displayPlot(self):
+	# 	"""
+	# 	displays a time plot of the unprocessed data
+	# 	"""
+	# 	x = np.arange(0, 5, 0.1);
+	# 	y = np.sin(x)
+	# 	plt.plot(x, y)
 
-	def displayPlot():
-		"""
-		displays a time plot of the unprocessed data
-		"""
 
-	def displayStatistics():
+	def displayStatistics(self):
 		"""
 		displays the head orientation statistics for time interval analised,
 		including:
@@ -188,8 +234,23 @@ class AnalysisTools:
 			-a matplotlib histogram of the distrobution (of yaw)
 		"""
 
+		#grab all yaw values
+		yawValues = []
+		for sample in self.rawData:
+			yawValues.append(sample['orientation'][2])
+
+		# the histogram of the data
+		plt.hist(yawValues, 50)
+		plt.xlabel('average yaw angle')
+		plt.ylabel('Probability')
+		plt.title(r'statistical analysis of head yaw position')
+		plt.grid(True)
+		plt.show()
+
+
 	def yawRollCorrelation():
 		"""
 		how often do patients hold their heads simultaniously yawed and 
 		rolled, having posture that is single axis?
 		"""
+		pass #to be implemented

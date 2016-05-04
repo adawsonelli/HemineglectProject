@@ -234,10 +234,10 @@ class Simulator:
 		#working at a computer, 
 		self.rightBias(5,120)
 		self.leftHeadTurn(50,1) #looking left to talk to a collegue,
-		self.leftBias(50,30)
+		self.leftBias(50,7)
 		self.nod(10,2)         #noding in agreement
 		self.rightHeadTurn(50,1) #return to work
-		self.rightBias(5,20)  
+		self.rightBias(5,45)  
 
 		#publish activity to a file
 		self.publish('exampleData.txt')

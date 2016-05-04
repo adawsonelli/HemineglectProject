@@ -91,6 +91,7 @@ def test_sample2string():
   	assert string.split() == ['123.456', '0.0', '3.5', '0.0']
 
 
+
 #-------------------------AnalysisTools Tests----------------------------
 
 #instantiate analysisTools object
@@ -148,4 +149,3 @@ def test_calcStdDevHeadPos():
 # 	anaTool.filterHeadTurns()
 # 	assert self.leftHeadTurns == 1
 # 	assert self.rightHeadTurns == 1
-
