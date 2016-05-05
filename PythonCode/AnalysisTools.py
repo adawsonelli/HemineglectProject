@@ -30,7 +30,7 @@ class AnalysisTools:
 
 
 
-	def readInRawData(self, filename):
+	def _readInRawData(self, filename):
 		"""
 		string -> none
 		takes in the filename of a file to analyze, and writes it
@@ -57,7 +57,7 @@ class AnalysisTools:
 
 		file.close()
 
-	def removeZeros(self):
+	def _removeZeros(self):
 		"""
 		patient may walk away from the computer or step out of the FOV 
 		the camera for a period of time. potentially on a real system, this 
@@ -78,7 +78,7 @@ class AnalysisTools:
 
 
 
-	def removeFarAwayEvents(self):
+	def _removeFarAwayEvents(self):
 		"""
 		when patient is entering or exiting the frame, we want to 
 		filter out that event so it doesn't get used in our statistics
@@ -88,7 +88,7 @@ class AnalysisTools:
 
 	
 
-	def cleanReadline(self, file):
+	def _cleanReadline(self, file):
 		""" 
 		file -> str
 
@@ -116,7 +116,7 @@ class AnalysisTools:
 		return line
 
 
-	def filtHeadTurns(self):
+	def _filtHeadTurns(self):
 		"""
 		filters out turning events, catagorizing them into left
 		or right turning events. 
@@ -151,7 +151,7 @@ class AnalysisTools:
 
 
 
-	def findSR(self):
+	def _findSR(self):
 		"""
 		determines the SR based on the timestamps, and saves it to
 		the attribute self.sr
@@ -162,7 +162,7 @@ class AnalysisTools:
 		self.sr = 1/delT
 
 
-	def calcAvgHeadPos(self):
+	def _calcAvgHeadPos(self):
 		"""
 		none -> list
 		finds the average of the filtered head data
@@ -182,7 +182,7 @@ class AnalysisTools:
 		return avg
 
 
-	def calcStdDevHeadPos(self):
+	def _calcStdDevHeadPos(self):
 		"""
 		none -> list
 		finds the standard deviation of the filtered head data

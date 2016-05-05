@@ -4,6 +4,7 @@ Author: Alex Dawson-Elli
 styleGuide for Hemineglect project: 
 	-all functions (methods) are to be written in lower camelCase
 	-all classes start with a capital letter
+	-private functions start with an underscore
 	-one class per file, name the file after the class
 	-all objects start with a lowercase letter, and are frequently
 	related to the class by name 
