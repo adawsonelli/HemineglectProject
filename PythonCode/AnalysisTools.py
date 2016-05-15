@@ -2,6 +2,7 @@
 
 #-----imports------
 import numpy as np
+import datetime
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt
 
@@ -23,14 +24,10 @@ class AnalysisTools:
 			self.sr = 0 #sampleRate
 
 		else: #filename is supplied by user
-			self.readInRawData(filename)
-			self.removeZeros()
-			self.filtData = self.filtHeadTurns()
-			self.sr = self.findSR()
+			self.loadData(filename)
 
 
-
-	def _readInRawData(self, filename):
+	def readInRawData(self, filename):
 		"""
 		string -> none
 		takes in the filename of a file to analyze, and writes it
@@ -57,7 +54,7 @@ class AnalysisTools:
 
 		file.close()
 
-	def _removeZeros(self):
+	def removeZeros(self):
 		"""
 		patient may walk away from the computer or step out of the FOV 
 		the camera for a period of time. potentially on a real system, this 
@@ -78,7 +75,7 @@ class AnalysisTools:
 
 
 
-	def _removeFarAwayEvents(self):
+	def removeFarAwayEvents(self):
 		"""
 		when patient is entering or exiting the frame, we want to 
 		filter out that event so it doesn't get used in our statistics
@@ -88,7 +85,7 @@ class AnalysisTools:
 
 	
 
-	def _cleanReadline(self, file):
+	def cleanReadline(self, file):
 		""" 
 		file -> str
 
@@ -116,7 +113,7 @@ class AnalysisTools:
 		return line
 
 
-	def _filtHeadTurns(self):
+	def filtHeadTurns(self):
 		"""
 		filters out turning events, catagorizing them into left
 		or right turning events. 
@@ -151,7 +148,7 @@ class AnalysisTools:
 
 
 
-	def _findSR(self):
+	def findSR(self):
 		"""
 		determines the SR based on the timestamps, and saves it to
 		the attribute self.sr
@@ -162,7 +159,7 @@ class AnalysisTools:
 		self.sr = 1/delT
 
 
-	def _calcAvgHeadPos(self):
+	def calcAvgHeadPos(self):
 		"""
 		none -> list
 		finds the average of the filtered head data
@@ -182,7 +179,7 @@ class AnalysisTools:
 		return avg
 
 
-	def _calcStdDevHeadPos(self):
+	def calcStdDevHeadPos(self):
 		"""
 		none -> list
 		finds the standard deviation of the filtered head data
@@ -216,13 +213,22 @@ class AnalysisTools:
 
 
 
-	# def displayPlot(self):
-	# 	"""
-	# 	displays a time plot of the unprocessed data
-	# 	"""
-	# 	x = np.arange(0, 5, 0.1);
-	# 	y = np.sin(x)
-	# 	plt.plot(x, y)
+	def displayPlot(self):
+		"""
+		displays a time plot of the unprocessed data
+		"""
+		timeVector = []  #list of datetime objects
+		yawValues  = []
+		for sample in self.rawData:
+			timeVector.append(datetime.datetime.fromtimestamp(sample['time']))
+			yawValues.append(sample['orientation'][2])
+
+		
+
+		# plot
+		plt.plot(timeVector, yawValues)
+		plt.gcf().autofmt_xdate()
+		plt.show()
 
 
 	def displayStatistics(self):

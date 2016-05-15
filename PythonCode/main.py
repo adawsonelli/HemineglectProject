@@ -11,4 +11,5 @@ anaTool.loadData('exampleData.txt')
 
 
 #display statistics
+anaTool.displayPlot()
 anaTool.displayStatistics()
